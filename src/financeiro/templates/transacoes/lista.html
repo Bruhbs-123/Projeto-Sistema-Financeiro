@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% block content %}
+    <h2>Saldo Atual: R$ {{ "%.2f"|format(saldo) }}</h2>
+    <table class="table">
+        {% for t in transacoes %}
+        <tr>
+            <td>{{ t.descricao }}</td>
+            <td class="{{ 'text-success' if t.tipo == 'receita' else 'text-danger' }}">
+                R$ {{ "%.2f"|format(t.valor|float) }}
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+{% endblock %}
