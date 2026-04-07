@@ -1,0 +1,173 @@
+/* =========================================
+   ESTILO NUBANK - SISTEMA FINANCEIRO
+   ========================================= */
+
+
+   body {
+    background-color: red !important;
+}
+
+/* 1. Variáveis de Cores e Configurações Gerais */
+:root {
+    --nu-purple: #8A05BE;       /* Roxo oficial */
+    --nu-purple-light: #A333CF; /* Roxo vibrante */
+    --nu-purple-dark: #5F0281;  /* Hover dos botões */
+    --nu-bg: #F0F1F5;          /* Cinza azulado de fundo */
+    --nu-text-main: #111111;    /* Texto principal quase preto */
+    --nu-text-gray: #767676;    /* Texto secundário/legendas */
+    --nu-success: #269144;      /* Verde de rendimento/saldo */
+}
+
+/* 2. Reset e Tipografia */
+body {
+    background-color: var(--nu-bg) !important;
+    font-family: 'Inter', sans-serif !important;
+    color: var(--nu-text-main);
+    margin: 0;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* 3. Barra de Navegação (Navbar) */
+/* 3. Barra de Navegação (Navbar) Totalmente Roxa */
+.navbar-nu {
+    background-color: var(--nu-purple) !important; /* Força o roxo oficial */
+    padding: 1.0rem 0 !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    border: none !important;
+}
+
+/* Cor do nome "nu financeiro" */
+.navbar-brand {
+    font-weight: 800 !important;
+    color: white !important; /* Texto branco no fundo roxo */
+    font-size: 1.6rem !important;
+    letter-spacing: -1px;
+}
+
+/* Cor dos links do menu (Início, Transações, etc) */
+.nav-link {
+    color: rgba(255, 255, 255, 0.9) !important; /* Branco levemente transparente */
+    font-weight: 500 !important;
+    margin-left: 15px;
+    transition: 0.3s;
+}
+
+.nav-link:hover {
+    color: white !important;
+    opacity: 1;
+}
+
+/* Ajuste do botão de "Sair" ou "Perfil" dentro do menu roxo */
+.navbar .fa-circle-user, .navbar .fa-user {
+    color: white !important;
+}
+
+/* 4. Cards (Containers de Saldo, Gráficos e Tabelas) */
+/* Aplicamos aos containers e cards para garantir o arredondamento */
+.nu-card, .card, .container > div:not(.navbar) {
+    background-color: white !important;
+    border-radius: 16px !important;
+    padding: 24px !important;
+    border: none !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04) !important;
+    margin-bottom: 24px !important;
+}
+
+/* 5. Botões */
+.btn-primary, .btn-nu, button[type="submit"] {
+    background-color: var(--nu-purple) !important;
+    color: white !important;
+    border: none !important;
+    border-radius: 50px !important; /* Totalmente redondo */
+    padding: 10px 28px !important;
+    font-weight: 600 !important;
+    transition: all 0.3s ease !important;
+    text-transform: none !important;
+}
+
+.btn-primary:hover, .btn-nu:hover {
+    background-color: var(--nu-purple-dark) !important;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(138, 5, 190, 0.3);
+}
+
+/* 6. Tabela de Transações */
+.table {
+    margin-top: 10px;
+    border-collapse: separate;
+    border-spacing: 0 8px;
+}
+
+.table thead th {
+    color: var(--nu-text-gray);
+    font-weight: 500;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    border: none;
+    padding: 12px;
+}
+
+.table tbody tr {
+    background-color: #ffffff;
+    transition: background 0.2s;
+}
+
+.table tbody td {
+    padding: 16px 12px;
+    border-top: 1px solid #F5F5F5;
+    border-bottom: 1px solid #F5F5F5;
+    vertical-align: middle;
+}
+
+/* 7. Destaques de Saldo */
+.saldo-valor {
+    color: var(--nu-success) !important;
+    font-size: 2.5rem !important;
+    font-weight: 700 !important;
+    letter-spacing: -1px;
+}
+
+.saldo-label {
+    color: var(--nu-text-gray);
+    font-size: 0.95rem;
+    font-weight: 500;
+    margin-bottom: 4px;
+}
+
+/* 8. Filtros e Inputs */
+input, select {
+    border-radius: 8px !important;
+    border: 1px solid #E0E0E0 !important;
+    padding: 8px 12px !important;
+}
+
+input:focus, select:focus {
+    border-color: var(--nu-purple) !important;
+    box-shadow: 0 0 0 0.2rem rgba(138, 5, 190, 0.15) !important;
+}
+
+/* 9. Alertas */
+.alert {
+    border-radius: 12px !important;
+    border: none !important;
+    font-weight: 500;
+}   
+
+
+
+
+/* Mate o quadrado branco de vez atacando a classe d-flex diretamente dentro da navbar */
+nav.navbar-nu .d-flex, 
+nav.navbar-nu div.d-flex,
+.navbar-nu .d-flex.align-items-center {
+    background: transparent !important;
+    background-color: transparent !important;
+    box-shadow: none !important;
+    border: none !important;
+}
+
+/* Se o quadrado for no ícone */
+.navbar-nu i {
+    background: transparent !important;
+    box-shadow: none !important;
+}
