@@ -1,14 +1,119 @@
 {% extends 'base.html' %}
+
 {% block content %}
-    <h2>Saldo Atual: R$ {{ "%.2f"|format(saldo) }}</h2>
-    <table class="table">
-        {% for t in transacoes %}
-        <tr>
-            <td>{{ t.descricao }}</td>
-            <td class="{{ 'text-success' if t.tipo == 'receita' else 'text-danger' }}">
-                R$ {{ "%.2f"|format(t.valor|float) }}
-            </td>
-        </tr>
+<div class="container mt-4">
+    <div class="card bg-light border-0 mb-4 shadow-sm">
+        <div class="card-body">
+            <form method="GET" action="{{ url_for('transacoes.lista') }}" class="row g-2 align-items-center">
+                <div class="col-auto">
+                    <select name="mes" class="form-select form-select-sm">
+                        {% for m in range(1, 13) %}
+                            <option value="{{ m }}" {{ 'selected' if m == mes_atual }}>
+                                {{ ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'][m-1] }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-auto">
+                    <input type="number" name="ano" class="form-control form-control-sm" value="{{ ano_atual }}" style="width: 100px;">
+                </div>
+                <div class="col-auto">
+                    <button type="submit" class="btn btn-sm btn-secondary">Filtrar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold">Saldo: <span class="{{ 'text-success' if saldo >= 0 else 'text-danger' }}">R$ {{ "%.2f"|format(saldo) }}</span></h2>
+        <a href="{{ url_for('transacoes.nova') }}" class="btn btn-primary shadow">+ Nova Transação</a>
+    </div>
+
+    <div class="row mb-4">
+        {% set cores = ['border-primary', 'border-success', 'border-warning', 'border-info', 'border-danger'] %}
+        {% for categoria, total in resumo %}
+        <div class="col-md-3 mb-3">
+            <div class="card p-2 shadow-sm border-0 border-start border-4 {{ cores[loop.index0 % cores|length] }}">
+                <small class="text-muted fw-bold">{{ categoria|upper if categoria else 'GERAL' }}</small>
+                <h6 class="mb-0">R$ {{ "%.2f"|format(total|float) }}</h6>
+            </div>
+        </div>
         {% endfor %}
-    </table>
+    </div>
+
+    <div class="row mb-5">
+        <div class="col-md-5 mx-auto">
+            <div class="card shadow-sm border-0 p-3">
+                <h5 class="text-center text-muted mb-3">Distribuição de Gastos</h5>
+                <div style="height: 250px; position: relative;">
+                    <canvas id="meuGrafico"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow-sm border-0">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>Descrição</th>
+                    <th>Categoria</th>
+                    <th class="text-end">Valor</th>
+                    <th class="text-center">Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for t in transacoes %}
+                <tr>
+                    <td>{{ t.descricao }}</td>
+                    <td><span class="badge rounded-pill bg-light text-dark border">{{ t.categoria if t.categoria else 'Geral' }}</span></td>
+                    <td class="text-end {{ 'text-success' if t.tipo == 'receita' else 'text-danger' }}">
+                        {{ '+' if t.tipo == 'receita' else '-' }} R$ {{ "%.2f"|format(t.valor|float) }}
+                    </td>
+                    <td class="text-center">
+                        <form action="{{ url_for('transacoes.deletar', id=t.id) }}" method="POST" onsubmit="return confirm('Deseja excluir?')">
+                            <button type="submit" class="btn btn-sm btn-outline-danger">Excluir</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const canvas = document.getElementById('meuGrafico');
+        if (!canvas) return; // Evita erro se o canvas não existir na página
+
+        const ctx = canvas.getContext('2d');
+        
+        // O filtro |tojson já coloca as aspas e colchetes necessários
+        const labels = {{ labels_json|tojson }};
+        const data = {{ valores_json|tojson }};
+
+        if (labels.length > 0) {
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: data,
+                        backgroundColor: ['#0d6efd', '#198754', '#ffc107', '#0dcaf0', '#dc3545', '#6c757d'],
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    maintainAspectRatio: false,
+                    cutout: '70%',
+                    plugins: {
+                        legend: { position: 'bottom' }
+                    }
+                }
+            });
+        }
+    });
+</script>
 {% endblock %}
