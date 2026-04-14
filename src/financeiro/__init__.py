@@ -3,6 +3,8 @@ from flask import Flask
 from dotenv import load_dotenv
 from .extensions import db, migrate
 from .blueprints.transacoes import bp as transacoes_bp
+# 1. Importe o novo blueprint de autenticação que vamos criar
+from .blueprints.auth import bp as auth_bp 
 
 load_dotenv()
 
@@ -14,5 +16,9 @@ def create_app():
     db.init_app(app)
     migrate.init_app(app, db)
 
+    # Registro das rotas
     app.register_blueprint(transacoes_bp)
+    # 2. Registre o blueprint de autenticação
+    app.register_blueprint(auth_bp) 
+    
     return app

@@ -1,0 +1,25 @@
+# Ambiente Virtual (Obrigatório: o venv não deve ser versionado)
+venv/
+ENV/
+env/
+.venv/
+
+# Variáveis de Ambiente (Contém senhas e chaves sensíveis)
+.env
+
+# Cache do Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Banco de Dados Local (Caso use SQLite para testes)
+*.db
+*.sqlite3
+
+# Pastas de configuração do Editor (VS Code / PyCharm)
+.vscode/
+.idea/
+
+# Arquivos de Sistema
+.DS_Store
+Thumbs.db

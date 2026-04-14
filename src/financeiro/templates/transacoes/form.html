@@ -16,27 +16,26 @@
         </div>
 
         <div class="mb-3">
-            <label for="categoria" class="form-label">Categoria</label>
-            <select name="categoria" id="categoria" class="form-select">
-                <option value="Alimentação">Alimentação</option>
-                <option value="Lazer">Lazer</option>
-                <option value="Moradia">Moradia</option>
-                <option value="Transporte">Transporte</option>
-                <option value="Saúde">Saúde</option>
-                <option value="Outros" selected>Outros</option>
+            <label for="categoria_id" class="form-label">Categoria</label>
+            <select name="categoria_id" id="categoria_id" class="form-select" required>
+                <option value="" disabled selected>Selecione uma categoria</option>
+                {% for c in categorias %}
+                    <option value="{{ c.id }}">{{ c.nome }}</option>
+                {% endfor %}
             </select>
+            <small class="text-muted">Se não aparecer nada, cadastre categorias no banco.</small>
         </div>
 
         <div class="mb-3">
             <label class="form-label">Tipo</label>
-            <select name="tipo" class="form-control">
+            <select name="tipo" class="form-select">
                 <option value="receita">Receita</option>
                 <option value="despesa">Despesa</option>
             </select>
         </div>
 
         <button type="submit" class="btn btn-success">Salvar Transação</button>
-       <a href="{{ url_for('transacoes.lista') }}" class="btn btn-secondary">Cancelar</a>
+        <a href="{{ url_for('transacoes.lista') }}" class="btn btn-secondary">Cancelar</a>
     </form>
 </div>
 {% endblock %}

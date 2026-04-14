@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash
-from src.financeiro.models import Transacao
+from src.financeiro.models import Transacao, Categoria
 from src.financeiro.extensions import db
 from sqlalchemy import func, extract
 from datetime import datetime, date
@@ -8,11 +8,9 @@ bp = Blueprint('transacoes', __name__)
 
 @bp.route('/')
 def lista():
-    # 1. Filtros de Data
     mes_selecionado = request.args.get('mes', datetime.now().month, type=int)
     ano_selecionado = request.args.get('ano', datetime.now().year, type=int)
 
-    # 2. Cálculo do Saldo Acumulado (Histórico total até o mês filtrado)
     if mes_selecionado == 12:
         limite_data = date(ano_selecionado + 1, 1, 1)
     else:
@@ -21,27 +19,30 @@ def lista():
     historico = Transacao.query.filter(Transacao.data < limite_data).all()
     saldo_total = sum(float(i.valor) if i.tipo == 'receita' else -float(i.valor) for i in historico)
 
-    # 3. Transações do Mês Selecionado (Tabela)
     itens_do_mes = Transacao.query.filter(
         extract('month', Transacao.data) == mes_selecionado,
         extract('year', Transacao.data) == ano_selecionado
     ).order_by(Transacao.data.desc()).all()
 
-    # 4. Resumo por Categoria (Gráfico e Cards)
     resumo_query = db.session.query(
-        Transacao.categoria, 
+        Categoria.nome, 
         func.sum(Transacao.valor)
-    ).filter(
+    ).join(Categoria).filter(
         Transacao.tipo == 'despesa',
         extract('month', Transacao.data) == mes_selecionado,
         extract('year', Transacao.data) == ano_selecionado
-    ).group_by(Transacao.categoria).all()
+    ).group_by(Categoria.nome).all()
 
-    # 5. Preparação dos dados do Gráfico (Garante que não venha vazio)
-    labels_grafico = [str(item[0]) if item[0] else "Geral" for item in resumo_query]
+    cores_map = {
+        'Alimentação': '#8A05BE', 'Lazer': '#BC58FF', 
+        'Moradia': '#4B0082', 'Saúde': '#E0AAFF', 
+        'Transporte': '#3D0066', 'Outros': '#9D4EDD'
+    }
+
+    labels_grafico = [str(item[0]) for item in resumo_query]
     valores_grafico = [float(item[1]) for item in resumo_query]
+    cores_lista = [cores_map.get(label, '#CFCFC4') for label in labels_grafico]
 
-    # ÚNICO RETURN - Envia tudo para o HTML
     return render_template(
         'transacoes/lista.html', 
         transacoes=itens_do_mes, 
@@ -50,37 +51,42 @@ def lista():
         mes_atual=mes_selecionado,
         ano_atual=ano_selecionado,
         labels_json=labels_grafico,
-        valores_json=valores_grafico
+        valores_json=valores_grafico,
+        cores_json=cores_lista
     )
 
 @bp.route('/nova', methods=['GET', 'POST'])
 def nova():
+    categorias = Categoria.query.all()
     if request.method == 'POST':
-        try:
-            desc = request.form.get('descricao')
-            val_input = request.form.get('valor')
-            tip = request.form.get('tipo')
-            categoria = request.form.get('categoria')
+        nova_t = Transacao(
+            descricao=request.form.get('descricao'),
+            valor=request.form.get('valor'),
+            tipo=request.form.get('tipo'),
+            categoria_id=request.form.get('categoria_id'),
+            data=datetime.now()
+        )
+        db.session.add(nova_t)
+        db.session.commit()
+        return redirect(url_for('transacoes.lista'))
+    return render_template('transacoes/form.html', categorias=categorias)
 
-            val = float(val_input.replace(',', '.'))
-            if val <= 0:
-                flash("O valor deve ser maior que zero!", "warning")
-                return redirect(url_for('transacoes.nova'))
-
-            t = Transacao(descricao=desc, valor=val, tipo=tip, categoria=categoria, user_id=1)
-            db.session.add(t)
-            db.session.commit()
-            flash("Transação salva com sucesso!", "success")
-            return redirect(url_for('transacoes.lista'))
-        except Exception:
-            flash("Erro ao processar o valor. Use apenas números.", "danger")
-            return redirect(url_for('transacoes.nova'))
-    return render_template('transacoes/form.html')
+@bp.route('/editar/<int:id>', methods=['GET', 'POST'])
+def editar(id):
+    t = Transacao.query.get_or_404(id)
+    categorias = Categoria.query.all()
+    if request.method == 'POST':
+        t.descricao = request.form.get('descricao')
+        t.valor = request.form.get('valor')
+        t.tipo = request.form.get('tipo')
+        t.categoria_id = request.form.get('categoria_id')
+        db.session.commit()
+        return redirect(url_for('transacoes.lista'))
+    return render_template('transacoes/form.html', transacao=t, categorias=categorias)
 
 @bp.route('/deletar/<int:id>', methods=['POST'])
 def deletar(id):
     t = Transacao.query.get_or_404(id)
     db.session.delete(t)
     db.session.commit()
-    flash("Removido!", "success")
     return redirect(url_for('transacoes.lista'))
