@@ -18,11 +18,21 @@
             <a class="navbar-brand" href="{{ url_for('transacoes.lista') }}">Financeiro</a>
             
             <div class="d-flex align-items-center">
-                <a href="{{ url_for('auth.cadastro') }}" class="btn btn-sm btn-outline-light me-3">
-                    <i class="fa-solid fa-user-plus me-1"></i> Cadastrar
-                </a>
-                
-                <i class="fa-regular fa-circle-user text-white fs-3"></i>
+                {% if session.get('user_id') %}
+                    <span class="text-white me-3" style="font-size: 0.9rem;">
+                        <i class="fa-solid fa-user me-1"></i> {{ session.get('user_nome') }}
+                    </span>
+                    <a href="{{ url_for('auth.logout') }}" class="btn btn-sm btn-outline-light">
+                        <i class="fa-solid fa-right-from-bracket me-1"></i> Sair
+                    </a>
+                {% else %}
+                    <a href="{{ url_for('auth.login') }}" class="btn btn-sm btn-outline-light me-2">
+                        <i class="fa-solid fa-right-to-bracket me-1"></i> Entrar
+                    </a>
+                    <a href="{{ url_for('auth.cadastro') }}" class="btn btn-sm btn-outline-light">
+                        <i class="fa-solid fa-user-plus me-1"></i> Cadastrar
+                    </a>
+                {% endif %}
             </div>
         </div>
     </nav>

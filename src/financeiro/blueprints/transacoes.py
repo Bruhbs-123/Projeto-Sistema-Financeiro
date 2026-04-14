@@ -3,6 +3,7 @@ from src.financeiro.models import Transacao, Categoria
 from src.financeiro.extensions import db
 from sqlalchemy import func, extract
 from datetime import datetime, date
+from flask import session
 
 bp = Blueprint('transacoes', __name__)
 
@@ -59,16 +60,19 @@ def lista():
 def nova():
     categorias = Categoria.query.all()
     if request.method == 'POST':
-        nova_t = Transacao(
+         nova_t = Transacao(
             descricao=request.form.get('descricao'),
             valor=request.form.get('valor'),
             tipo=request.form.get('tipo'),
             categoria_id=request.form.get('categoria_id'),
-            data=datetime.now()
-        )
-        db.session.add(nova_t)
-        db.session.commit()
-        return redirect(url_for('transacoes.lista'))
+            data=datetime.now(),
+            user_id=session.get('user_id')
+       )
+        
+        
+         db.session.add(nova_t)
+         db.session.commit()
+         return redirect(url_for('transacoes.lista'))
     return render_template('transacoes/form.html', categorias=categorias)
 
 @bp.route('/editar/<int:id>', methods=['GET', 'POST'])
@@ -90,3 +94,4 @@ def deletar(id):
     db.session.delete(t)
     db.session.commit()
     return redirect(url_for('transacoes.lista'))
+
