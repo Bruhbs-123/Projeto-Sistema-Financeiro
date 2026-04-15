@@ -52,27 +52,30 @@ Para a demonstração do sistema, destacamos as seguintes regras:
 
     Filtro de Competência Mensal: O dashboard utiliza funções de extração de data do MySQL para processar e somar transações apenas do mês e ano selecionados. Isso evita a mistura de saldos e fornece uma análise financeira precisa por período.
 
-🔗 Rotas do Sistema
+🔗 Rotas Disponíveis
 
-A aplicação está organizada em Blueprints para melhor manutenção:
+O sistema está organizado em módulos (Blueprints) para separar a lógica de autenticação da lógica de negócios:
+1. Autenticação (Blueprint: auth)
 
-Módulo de Autenticação (auth):
+    /auth/login: Exibe o formulário de login e processa a autenticação do usuário. (Renderiza: auth/login.html)
 
-    /auth/login - Tela de acesso.
+    /auth/cadastro: Permite o registro de novos usuários no sistema. (Renderiza: auth/cadastro.html)
 
-    /auth/cadastro - Criação de nova conta.
+    /auth/logout: Encerra a sessão do usuário atual.
 
-    /auth/logout - Finalização da sessão.
+2. Gestão Financeira (Blueprint: transacoes)
 
-Módulo Financeiro (transacoes):
+    / ou /transacoes/: Dashboard principal com o resumo financeiro e a listagem das transações do usuário logado. (Renderiza: transacoes/lista.html)
 
-    / ou /transacoes/ - Dashboard principal e lista de lançamentos.
+    /transacoes/cadastrar: Exibe o formulário para adicionar uma nova entrada ou saída. (Renderiza: transacoes/form.html)
 
-    /transacoes/cadastrar - Cadastro de novas receitas/despesas.
+    /transacoes/editar/<int:id>: Carrega os dados de uma transação específica para edição. (Renderiza: transacoes/form.html)
 
-    /transacoes/editar/<id> - Edição de registros existentes.
+    /transacoes/deletar/<int:id>: Rota interna para excluir uma transação e redirecionar para a listagem.
 
-    /transacoes/deletar/<id> - Remoção de registros.
+3. Metas (Integrada em transacoes ou módulo próprio)
+
+    /metas/: Visualização e acompanhamento das metas financeiras definidas (com base no seu arquivo models.py).
 
 📦 Como Executar o Projeto
 
